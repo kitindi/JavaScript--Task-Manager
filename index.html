@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-200">
+    <main class="w-full h-full p-4 md:p-10 flex items-center justify-center">
+      <div class="w-full max-w-xl bg-white p-5 rounded-lg">
+        <div class="flex items-center justify-between border-b py-2">
+          <div class="flex-1 px-2 text-start">
+            <h2 class="text-md text-slate-400">Messages</h2>
+          </div>
+          <div class="flex-1 px-2 text-center">
+            <h2 class="text-md font-medium text-slate-600">Today's Task</h2>
+          </div>
+          <div class="flex-1 px-2 text-end">
+            <h2 class="text-md text-slate-400">Last Activity</h2>
+          </div>
+        </div>
+        <!-- Add task button section-->
+        <div class="flex items-center justify-between px-2 mt-8">
+          <div class="flex-1">
+            <h2 class="text-xl font-semibold">Today's Task</h2>
+          </div>
+          <div class="flex-1 flex justify-end items-start">
+            <button class="bg-[#E2EBFA] px-6 py-2 rounded-md text-[#0050FB] flex items-center create-btn">
+              <span
+                ><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" color="#0050fb" fill="none">
+                  <path d="M12 4V20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M4 12H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></span
+              >New Task
+            </button>
+          </div>
+        </div>
+        <!-- date section -->
+        <div class="px-2"><p class="todate py-2 text-slate-500"></p></div>
+        <!-- Stats section -->
+        <div class="flex items-center p-2">
+          <div class="border-r pr-5">
+            <h3 class="text-[#0050FB] font-semibold flex items-center gap-2">
+              All <span class="w-5 h-fit rounded-lg bg-[#0050FB] mr-3 p-1 text-[8px] text-white flex items-center justify-center all"> 0</span>
+            </h3>
+          </div>
+          <div class="px-5">
+            <h3 class="text-gray-400 font-semibold flex items-center gap-2">
+              Open <span class="w-5 h-fit rounded-lg bg-gray-300 mr-3 p-1 text-[8px] text-white flex items-center justify-center"> 0</span>
+            </h3>
+          </div>
+          <div class="px-5">
+            <h3 class="text-gray-400 font-semibold flex items-center gap-2">
+              Closed <span class="w-5 h-fit rounded-lg bg-gray-300 mr-3 p-1 text-[8px] text-white flex items-center justify-center"> 0</span>
+            </h3>
+          </div>
+        </div>
+        <!-- input box -->
+        <div class="flex items-center gap-5 input-gruop hidden">
+          <input type="text" class="w-full border rounded-md border-[#0050FB] p-2 mt-5 text-slate-400 focus:outline-none" placeholder="Add a new task" />
+          <button class="bg-[#0050FB] px-5 py-2 text-white rounded-md mt-5 add-btn">Add</button>
+        </div>
+        <!-- Task Card -->
+        <div class="py-4 mt-5 task-list">
+          <!-- Card Item -->
+        </div>
+      </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+      const today = new Date();
+      const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+      document.querySelector(".todate").textContent = today.toLocaleDateString(undefined, options);
+
+      <!-- toggle between the checked button -->
+
+      const cards = document.querySelectorAll(".card");
+      const createBtn = document.querySelector(".create-btn");
+      const addBtn = document.querySelector(".add-btn");
+
+      createBtn.addEventListener("click", () => {
+        const inputGroup = document.querySelector(".input-gruop");
+        inputGroup.classList.toggle("hidden");
+        createBtn.classList.toggle("hidden");
+      });
+
+      addBtn.addEventListener("click", () => {
+        const task = document.querySelector("input").value;
+
+        if (task) {
+          addTask(task);
+          createBtn.classList.toggle("hidden");
+          const inputGroup = document.querySelector(".input-gruop");
+          inputGroup.classList.toggle("hidden");
+        } else {
+          alert("Please enter a task");
+        }
+      });
+
+      // selectt every card and add event listener to
+
+      // Seting up local database for the task application : LocalStorage
+
+      const addTask = (task) => {
+        // Retrieve existing data or initialize an empty array
+        let existingData = localStorage.getItem("tasks");
+        let formData = existingData ? JSON.parse(existingData) : [];
+
+        // Add new task to the array
+        formData.push({ task });
+
+        // Save the data back to local storage
+        localStorage.setItem("tasks", JSON.stringify(formData));
+        location.reload(); // Reloads the entire page
+      };
+
+      // when window is loaded
+
+      // redering task list from local storage
+      const taskList = document.querySelector(".task-list");
+      window.addEventListener("load", function (event) {
+        let existingData = localStorage.getItem("tasks");
+
+        let formData = existingData ? JSON.parse(existingData) : [];
+        console.log(formData.length);
+
+        const taskCount = document.querySelector(".all");
+        taskCount.textContent = formData.length;
+        formData.forEach((task) => {
+          const card = `<div class="flex items-center justify-between p-2 border rounded-md py-3 mb-3 hover:cursor-pointer card">
+            <div class="flex-7 mr-5">
+              <h3 class="text-md font-regular mb-2 text-slate-500 decoration-gray-700 title">${task.task}</h3>
+            </div>
+            <div class="flex-1 flex justify-end items-start">
+              <button class="btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0050fb" viewBox="0 0 256 256">
+                  <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Z"></path>
+                </svg>
+              </button>
+              <button class="btn-checked hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0050fb" viewBox="0 0 256 256">
+                  <path
+                    d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </div>`;
+
+          taskList.innerHTML += card;
+        });
+      });
+
+      // Adding event deligation to the child elements
+
+      taskList.addEventListener("click", function (event) {
+        const cardx = event.target.closest(".card");
+        if (cardx) {
+          cardx.addEventListener("click", (e) => {
+            const btn = cardx.querySelector(".btn");
+            const title = cardx.querySelector(".title");
+            const btnChecked = cardx.querySelector(".btn-checked");
+            btn.classList.toggle("hidden");
+            btnChecked.classList.toggle("hidden");
+            title.classList.toggle("line-through");
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
